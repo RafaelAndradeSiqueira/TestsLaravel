@@ -25,4 +25,27 @@ class loginTest extends TestCase
         $response->assertSee('username');
         $response->assertSee('password');
     }
+
+    public function test_with_validate_erros(): void
+    {
+        $response = $this->post('/login', [
+            'email' => '',
+            'password' => '',
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHasErrors(['email', 'password']);
+    }
+
+    public function test_if_password_or_email_are_incorrect(): void
+    {
+        $response = $this->post('/login', [
+            'email' => 'email@example.com',
+            'password' => '123455678',
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHasErrors(['email', 'password']);
+        $response->assertRedirect('/login');
+    }
 }

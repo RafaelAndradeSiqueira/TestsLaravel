@@ -13,6 +13,23 @@ class LoginController extends Controller
 
     public function store(Request $request)
     {
-        return 1;
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $autentication = auth()->attempt([
+            'email' => $request->email,
+            'password' => $request->password,
+        ]);
+
+        if(!$autentication) {
+            return redirect()->route('login')->withErrors([
+                'email' => 'The provided credentials do not match our records.',
+                'password' => 'The provided credentials do not match our records.',
+            ]);
+        }
+
+        return redirect()->route('home');
     }
 }
