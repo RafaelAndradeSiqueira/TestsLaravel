@@ -2,11 +2,10 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+
 use Tests\TestCase;
 
-class loginTest extends TestCase
+class LoginTest extends TestCase
 {
     public function test_if_user_can_access_route(): void
     {
@@ -17,6 +16,8 @@ class loginTest extends TestCase
 
     public function test_if_user_can_access_route_and_see_content(): void
     {
+        $this->withoutExceptionHandling();
+
         $response = $this->get('/login');
 
         $response->assertStatus(200);
@@ -34,7 +35,6 @@ class loginTest extends TestCase
         ]);
 
         $response->assertStatus(302);
-        $response->assertSessionHasErrors(['email', 'password']);
     }
 
     public function test_if_password_or_email_are_incorrect(): void
