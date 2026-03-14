@@ -37,4 +37,20 @@ class ProductController extends Controller
         $product->delete();
         return response()->noContent();
     }
+
+
+    public function add(Product $product)
+    {
+        session()->push('cart', $product->id);
+        return response()->json(['message' => 'Product added to cart']);
+    }
+
+    public function productsInCart()
+    {
+        $cart = session()->get('cart', []);
+        $products = Product::whereIn('id', $cart)->get();
+        return response()->json($products);
+    }
+
+
 }

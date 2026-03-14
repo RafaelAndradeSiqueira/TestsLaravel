@@ -13,4 +13,6 @@ Route::post('/logout', [LoginController::class,'destroy'])->name('logout');
 
 Route::get('/products', [ProductController::class,'index'])->name('products.index');
 Route::post('/products', [ProductController::class,'store'])->name('products.store');
+Route::post('/products/{product}/add', [ProductController::class,'add'])->name('products.add');
+Route::get('/cart', [ProductController::class,'productsInCart'])->name('cart');
 Route::delete('/products/{id}', [ProductController::class,'destroy'])->name('products.destroy');

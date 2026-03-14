@@ -1,13 +1,12 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Http\Controllers;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\Product;
 
-class ProductTest extends TestCase
+class ProductControllerTest extends TestCase
 {
     use RefreshDatabase;
     /**
@@ -55,5 +54,35 @@ class ProductTest extends TestCase
         $response = $this->delete("/products/{$product->id}");
 
         $response->assertStatus(204);
+    }
+
+    public function test_add_product_to_session_cart(): void
+    {
+        $product = Product::factory()->create();
+
+        $response = $this->post("/products/{$product->id}/add");
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'message' => 'Product added to cart'
+        ]);
+
+        $this->assertContains($product->id, session('cart'));
+    }
+
+    public function test_get_products_from_cart(): void
+    {
+        $products = Product::factory()->count(3)->create();
+
+        $cartIds = $products->pluck('id')->toArray();
+
+        $response = $this->withSession([
+            'cart' => $cartIds
+        ])->get('/cart');
+
+        $response->assertStatus(200);
+
+        $response->assertJsonCount(3);
     }
 }
