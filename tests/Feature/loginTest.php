@@ -1,12 +1,14 @@
 <?php
 
 namespace Tests\Feature;
+use App\Models\User;
 
 
 use Tests\TestCase;
 
 class LoginTest extends TestCase
 {
+
     public function test_if_user_can_access_route(): void
     {
         $response = $this->get('/login');
@@ -48,4 +50,19 @@ class LoginTest extends TestCase
         $response->assertSessionHasErrors(['email', 'password']);
         $response->assertRedirect('/login');
     }
-}
+
+    public function test_if_user_can_login_successfully(): void
+    {
+        User::factory()->create([
+            'email' => 'email@example.com',
+            'password' => bcrypt('12345678')
+        ]);
+
+        $response = $this->post('/login', [
+            'email' => 'email@example.com',
+            'password' => '12345678'
+        ]);
+
+        $response->assertRedirect(route('home'));
+    }
+    }
