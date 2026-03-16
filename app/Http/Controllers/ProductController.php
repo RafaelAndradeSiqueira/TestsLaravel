@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Exceptions\ProductTwoException;
 
 class ProductController extends Controller
 {
@@ -49,8 +50,14 @@ class ProductController extends Controller
     {
         $cart = session()->get('cart', []);
         $products = Product::whereIn('id', $cart)->get();
+
+        if(session()->has('cart') && count(session()->get('cart')) >= 3) {
+            throw new ProductTwoException('Você não pode adicionar mais de 3 produtos ao carrinho.');
+        }
+
         return response()->json($products);
     }
+
 
 
 }

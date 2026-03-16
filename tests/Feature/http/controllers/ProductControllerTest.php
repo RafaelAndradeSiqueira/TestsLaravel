@@ -4,6 +4,8 @@ namespace Tests\Feature\Http\Controllers;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use \App\Exceptions\ProductTwoException;
+use \App\Http\Controllers\ProductController;
 use App\Models\Product;
 
 class ProductControllerTest extends TestCase
@@ -73,7 +75,7 @@ class ProductControllerTest extends TestCase
 
     public function test_get_products_from_cart(): void
     {
-        $products = Product::factory()->count(3)->create();
+        $products = Product::factory()->count(2)->create();
 
         $cartIds = $products->pluck('id')->toArray();
 
@@ -83,6 +85,20 @@ class ProductControllerTest extends TestCase
 
         $response->assertStatus(200);
 
-        $response->assertJsonCount(3);
+        $response->assertJsonCount(2);
+    }
+
+    public function test_products_in_cart_throws_exception_when_cart_has_3_products(): void
+    {
+        $products = Product::factory()->count(3)->create();
+
+        session([
+            'cart' => $products->pluck('id')->toArray()
+        ]);
+
+        $this->expectException(ProductTwoException::class);
+        $this->expectExceptionMessage('Você não pode adicionar mais de 3 produtos ao carrinho.');
+
+        app(ProductController::class)->productsInCart();
     }
 }
